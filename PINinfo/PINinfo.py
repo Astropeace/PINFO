@@ -1,7 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
-
+text = "hello"
 # Ask the user to input the PIN
 pin = input("Please enter a 14-digit PIN: ")
 
@@ -10,6 +11,11 @@ driver = webdriver.Firefox()
 
 # Open the website
 driver.get('https://www.cookcountypropertyinfo.com/')
+wait = WebDriverWait(driver, 10)
+original_window = driver.current_window_handle
+assert len(driver.window_handles) == 1 
+driver.maximize_window()
+
 
 try:
     # Find the input field and input the PIN
@@ -35,22 +41,41 @@ try:
         file.write(page_source)
        
 finally:
-    driver2 = webdriver.Firefox()
-    driver2.get('https://www.cookcountytreasurer.com/setsearchparameters.aspx')
+    driver.switch_to.new_window('tab')
+    
+    driver.get('https://www.cookcountytreasurer.com/setsearchparameters.aspx')
 try:
-    driver2.implicitly_wait(10)
-    search_box2 = driver2.find_element(By.ID,'ContentPlaceHolder1_ASPxPanel1_SearchByPIN1_txtPIN1')
+    driver.implicitly_wait(10)
+    search_box2 = driver.find_element(By.ID,'ContentPlaceHolder1_ASPxPanel1_SearchByPIN1_txtPIN1')
     search_box2.send_keys(pin)
+    driver.implicitly_wait(5)
     search_box2.submit()
-    button2 = driver2.find_element(By.ID, 'ContentPlaceHolder1_ASPxPanel1_SearchByPIN1_cmdContinue')
-    button2.click()
-    button2.send_keys(Keys.ENTER)
-    driver2.implicitly_wait(5)
+    submit2 = driver.find_element(By.NAME,'ctl00$ContentPlaceHolder1$ASPxPanel1$SearchByPIN1$cmdContinue')
+    submit2.click()
+    driver.implicitly_wait(5)
+    
+    
+    
+finally:
+    driver.switch_to.new_window('tab')
+    driver.get('https://crs.cookcountyclerkil.gov/Search')
+    driver.implicitly_wait(5)
+    search_box3 = driver.find_element(By.ID, 'inputField')
+    search_box3.send_keys(pin)
+    
+    search_box3.submit()
+    button3 = driver.find_element(By.ID, 'btnAddressSearch')
+    button3.click()
+    driver.implicitly_wait(5)
+    
+    
+    
+    
+    
+try:
    
-
-except Exception as e:
-    print(f"An error occurred: {e}")
+    driver.implicitly_wait(15)
 
 finally:
     # Close the browser
-    driver.quit()
+    driver.implicitly_wait(15)
